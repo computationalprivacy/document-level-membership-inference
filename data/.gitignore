@@ -1,0 +1,11 @@
+# Ignore everything in this directory
+*
+# Except these files
+!.gitignore
+!raw_gutenberg/
+!raw_arxiv_redpajama/
+
+# Specifically unignore the files in those directories
+raw_gutenberg/*
+raw_arxiv_redpajama/*
+
