@@ -13,7 +13,7 @@ Follow these steps to install the correct python environment:
 
 ## 2. Model setup
 
-We now download the target model we consider. Use `python src/split_chunks.py` or `scripts/download_model.sh` to do so for the desired model on Hugging Face. In the paper we used [OpenLLaMA](https://huggingface.co/openlm-research/open_llama_7b).
+We now download the target model we consider. Use `python src/split_chunks.py` or `scripts/download_model.sh` to do so for the desired model on Hugging Face. In the paper we used [OpenLLaMA](https://huggingface.co/openlm-research/open_llama_7b). The model and its tokenizer will then be saved in the directory of choice, by default in the script corresponding to `./pretrained/`.
 
 ## 2. Dataset setup
 
@@ -37,20 +37,35 @@ For this we use `python src/split_chunks.py -c config/SOME_CONFIG.ini` with the 
 
 We will now query the downloaded language model while running through each document, computing for each token its predicted probability and the top probabilities. 
 For this we use `python src/compute_perplexity.py` with the appropriate input arguments as in `scripts/compute_perplexity.sh`. Using GPUs is recommended for this. 
-The resulting token-level values are saved in `perplexity_results/`. 
+The resulting token-level values are saved in `perplexity_results/`. Note that parameter `max_length`here corresponds to the *context size C* to query the model as used in the paper. 
 
-At the same time, the general probability for each token and token frequency in the overall set of documents is computed and saved. 
+At the same time, the *general probability* for each token and *token frequency* in the overall set of documents is computed and saved. These normalization dictionaries are then used in the next step to normalize token-level probabilities to train the meta-classifier. 
 
 ## 5. Training and evaluating the meta-classifier for membership prediction
 
 We run this with `python main.py -c config/SOME_CONFIG.ini`, where the exact setup should be specified in the config file (such as the path to perplexity results, the normalization type, meta-classifier type etc). 
 The evaluation results are then saved in `classifier_results/`. The folder `./config/` contains all setups used to generate the results in the paper (for one dataset, i.e. books). 
 
+The following inputs correspond to the exact setups used in the paper. 
+- Normalization strategies:
+    - *NoNorm*: `norm_type='none'`
+    - *RatioNormTF*: `norm_type='ratio'` and `path_to_normalization_dict=PATH_TO_TOKEN_FREQ_DICT.pickle`
+    - *RatioNormGP*: `norm_type='ratio'` and `path_to_normalization_dict=PATH_TO_GENERAL_PROBA_DICT.pickle`
+    - *MaxNormTF*: `norm_type='diff_max_token_proba'` and `path_to_normalization_dict=PATH_TO_TOKEN_FREQ_DICT.pickle`
+    - *MaxNormGP*: `norm_type='diff_max_token_proba'` and `path_to_normalization_dict=PATH_TO_GENERAL_PROBA_DICT.pickle`
+- Document-level feature extraction:
+    - Aggregate feature extractor (*AggFE*): `feat_extraction_type='simple_agg'`
+    - Histogram feature extractor (*AggFE*): `feat_extraction_type='hist_K'` for a histogram with *K* bins. 
+    
+By default across all configs, both a logistic regression and random forest model are trained as meta-classifier (`models='logistic_regression,random_forest'`), while in the paper only the latter is used.
+    
+ 
+
 ## 6. Compute baselines
 
 We also provided the code we used to compute the baselines. For this we use `python src/compute_baselines.py` with the appropriate input arguments as in `scripts/compute_baselines.sh`. Note that the code comes from Shi et al. [here](https://github.com/swj0419/detect-pretrain-code).
 
-For the neighborhood baseline as introduced by Mattern et al., we adapt [their code](https://github.com/mireshghallah/neighborhood-curvature-mia) to `src/compute_baselines.py` and `scripts/compute_neighborhood_baselines.sh`. Note that its input requires a pickle file, but this could be easily adapted if needed. `
+For the neighborhood baseline as introduced by Mattern et al., we adapt [their code](https://github.com/mireshghallah/neighborhood-curvature-mia) to `src/compute_baselines.py` and `scripts/compute_neighborhood_baselines.sh`. Note that its input requires a pickle file, but this could be easily adapted if needed.
 
 ## 7. Citation
 
