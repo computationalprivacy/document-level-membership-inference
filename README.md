@@ -22,10 +22,10 @@ First and foremost, textual data should be collected and split in 'member' and '
 To reproduce the data collection we rely on the data download and preprocess scripts provided by RedPajama (their first version, so now an older branch [here](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1)). More specifically, we applied the following strategy for both data sources:
 - Books Project Gutenberg. 
     - Members: we just downloaded PG-19 from Hugging Face, as for instance [here](https://huggingface.co/datasets/deepmind/pg19).
-    - Non-members: we used public code to scrape books from Project Gutenberg using [this code](https://github.com/kpully/gutenberg_scraper). You can find the scripts we utilized to do so in `data/raw_gutenberg/`. Note that the book index to start from was manually searched from [Project Gutenberg](https://www.gutenberg.org/). 
+    - Non-members: we used public code to scrape books from Project Gutenberg using [this code](https://github.com/kpully/gutenberg_scraper). You can find the scripts we utilized to do so in `data/raw_gutenberg/`. Note that the book index to start from was manually searched from [Project Gutenberg](https://www.gutenberg.org/). **We make the corresponding dataset available on Hugging Face [here](https://huggingface.co/datasets/imperial-cpg/project-gutenberg-extended)**. 
 - Academic papers from ArXiv. 
     - Members: we download all `jsonl` files as provided by the V1 version of RedPajama. For all details see `data/raw_arxiv/`.
-    - Non-members: we download all ArXiv papers at a small cost using the resources ArXiv provides [here](https://info.arxiv.org/help/bulk_data_s3.html) and the script to do so [here](https://github.com/togethercomputer/RedPajama-Data/blob/rp_v1/data_prep/arxiv/run_download.py).
+    - Non-members: we download all ArXiv papers at a small cost using the resources ArXiv provides [here](https://info.arxiv.org/help/bulk_data_s3.html) and the script to do so [here](https://github.com/togethercomputer/RedPajama-Data/blob/rp_v1/data_prep/arxiv/run_download.py). Note that we do not make the dataset collected as non-members publicly available, as we do not have the license to distribute the data ourselves. 
     - All preprocessing for ArXiv has been done using [this script](https://github.com/togethercomputer/RedPajama-Data/blob/rp_v1/data_prep/arxiv/run_clean.py).
 
 Next, we also tokenize the data using `python src/tokenize_data.py` or `scripts/tokenize_data.sh`.
